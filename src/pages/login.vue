@@ -5,10 +5,10 @@
           欢迎登录仓库管理系统
         </el-header>
         <el-form-item label="">
-          <el-input v-model="data.account" placeholder="用户名：" clearable ></el-input>
+          <el-input class="login_input" v-model="data.account" placeholder="账号：" clearable ></el-input>
         </el-form-item>
         <el-form-item label="">
-          <el-input v-model="data.password" placeholder="密码：" show-password clearable ></el-input>
+          <el-input class="login_input" v-model="data.password" placeholder="密码：" show-password clearable ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="onSubmit" class="btn" type="primary">登录</el-button>
@@ -21,24 +21,30 @@
     title="注册账号"
     width="40%"
   >
-    <el-form :rules="data.rules" >
+    <el-form v-loading="screenLoading">
       <el-form-item>
-        <el-input class="regi_input" v-model="data.regi_acc" placeholder="请输入账号："></el-input>
+        <el-input class="regi_input" v-model="data.regi_acc" placeholder="请输入账号：" maxlength="20" minlength="6" show-word-limit clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-input class="regi_input" v-model="data.regi_pwd" placeholder="请输入密码："></el-input>
+        <el-input class="regi_input" v-model="data.regi_name" placeholder="请输入用户名：" maxlength="30" minlength="6" show-word-limit clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input class="regi_input" v-model="data.regi_pwd" placeholder="请输入密码：" maxlength="30" minlength="6" show-word-limit show-password clearable></el-input>
+      </el-form-item>      
+      <el-form-item>
+        <el-input class="regi_input" v-model="data.regi_email" placeholder="请输入邮箱：" maxlength="30" minlength="6" show-word-limit clearable></el-input>
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-tooltip content="提交注册之后，请等待管理员审核" placement="top" effect="dark">
-          <el-button type="primary" @click="onRegit, dialogVisible = false"
+          <el-button :disabled="disbutton" type="primary" @click="onRegit" 
             >注册</el-button
           >
         </el-tooltip>
         
 
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button :disabled="disbutton" @click="dialogVisible = false" >取消</el-button>
       </span>
     </template>
   </el-dialog>
@@ -49,54 +55,123 @@ import { reactive } from "@vue/reactivity";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { ElMessage, ElLoading } from "element-plus";
 export default {
   setup() {
     const router = useRouter();
     const dialogVisible = ref(false);
+    const screenLoading = ref(false);
+    const disbutton = ref(false);
     const data = reactive({
       account: "",
       password: "",
       regi_acc: "",
+      regi_name: "",
       regi_pwd: "",
-      rules: {
-        account: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 2, max: 8, message: "长度在 2 到 8 个字符", trigger: "blur" },
-        ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-      },
+      regi_email: "",
+      regi_message: "",
     });
 
+    //登录信息获取，用于判断和验证登录
     const getData = async () => {
-      const res = await axios.get("http://localhost:8080/selectByPageHelper");
-      if (
-        res.data.userList[0].user_account == data.account &&
-        res.data.userList[0].user_pwd == data.password
+      const res = await axios.get("http://localhost:8080/user/login", {
+        params: {
+          user_account: data.account,
+        },
+      });
+      if (res.data == "") {
+        ElMessage({
+          message: "账号不存在,请重新输入账号!",
+          type: "warning",
+        });
+      } else if (
+        res.data[0].user_account == data.account &&
+        res.data[0].user_pwd == data.password
       ) {
         console.log("OK");
         router.push({ path: "/main" });
       } else {
-        alert("密码错误或者账号不存在！");
+        ElMessage({
+          message: "密码错误！",
+          type: "warning",
+        });
       }
     };
 
-    const registry = async () =>{
-      const res = await axios.post();
-      
-    }
 
+
+    //登录按钮提交事件
     const onSubmit = () => {
-      getData();
+      if (data.account == "") {
+        ElMessage({
+          message: "账号不能为空",
+          type: "error",
+        });
+      } else if (data.password == "") {
+        ElMessage({
+          message: "密码不能为空",
+          type: "error",
+        });
+      } else {
+        getData();
+      }
+    };    
+    //注册用户信息
+    const registry = async () => {
+      const res = await axios.get("http://localhost:8080/user/Registry", {
+        params: {
+          user_account: data.regi_acc,
+          user_pwd: data.regi_pwd,
+          user_name: data.regi_name,
+          user_email: data.regi_email,
+        },
+      });
+      console.log(res);
     };
-
+    //注册按钮提交事件
     const onRegit = () => {
-
+      if (data.regi_acc == "") {
+        ElMessage({
+          message: "账号不能为空",
+          type: "error",
+        });
+      } else if (data.regi_pwd == "") {
+        ElMessage({
+          message: "密码不能为空",
+          type: "error",
+        });
+      } else if (data.regi_name == "") {
+        ElMessage({
+          message: "用户名不能为空",
+          type: "error",
+        });
+      } else if (data.regi_email == "") {
+        ElMessage({
+          message: "邮箱不能为空",
+          type: "error",
+        });
+      } else {
+        registry();
+        screenLoading.value = true;
+        disbutton.value = true;
+        setTimeout(() => {
+          disbutton.value = false;
+          screenLoading.value = false;
+          ElMessage({
+            message: "已提交注册申请，等待管理员审核",
+            type: "success",
+          });
+        }, 1500);
+      }
     };
+
     return {
       data,
       onSubmit,
       dialogVisible,
-      onRegit
+      onRegit,
+      screenLoading,
+      disbutton,
     };
   },
 };
@@ -125,15 +200,18 @@ export default {
   border: 1px solid #eaeaea;
   box-shadow: 0 0 25px #cac6c6;
 }
+.login_input {
+  font-size: 18px;
+}
 .btn {
   margin: 0 auto;
   font-size: 18px;
   width: 100px;
 }
-.regi_input{
-  font-size: 16px;
+.regi_input {
+  font-size: 18px;
   height: 30px;
-  width: 300px;
+  width: 400px;
   margin: 0 auto;
 }
 </style>
