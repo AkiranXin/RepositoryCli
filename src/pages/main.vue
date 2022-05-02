@@ -20,29 +20,30 @@
             :collapse="isCollapse"
             @open="handleOpen"
             @close="handleClose"
+            router="true"
           >
             <el-menu-item index="/main">
               <el-icon><icon-menu /></el-icon>
               <template #title>首页</template>
             </el-menu-item>
 
-            <el-sub-menu index="/userInfoManage">
+            <el-sub-menu index="/InfoManage">
               <template #title>
                 <el-icon><location /></el-icon>
                 <span>信息管理</span>
               </template>
 
               <el-item-group>
-                <el-menu-item index="2-1">个人信息管理</el-menu-item>
+                <el-menu-item index="/userInfoManage">个人信息管理</el-menu-item>
               </el-item-group>
             </el-sub-menu>
 
-            <el-menu-item index="/repoInoManage">
+            <el-menu-item index="/repoInfoManage">
               <el-icon><setting /></el-icon>
               <template #title>仓库信息管理</template>
             </el-menu-item>
 
-            <el-menu-item index="/repoIOManage">
+            <el-menu-item index="/IOInfoManage">
               <el-icon></el-icon>
               <template #title>出入库信息管理</template>
             </el-menu-item>
@@ -56,7 +57,6 @@
         <!-- 这里就是主体页面跳转 -->
         <el-main>
           <!-- 权限（状态管理） -->
-          <span>{{store.state}}</span>
           <template v-if="store.state.hasPermission == ''">没有权限</template>
           <template v-else>
             <!-- 主体页面部分跳转路由 -->
@@ -93,13 +93,13 @@ const router = useRouter();
 const isCollapse = ref(false);
 //处理点击事件
 const handleOpen = (key: string, keyPath: string[]) => {
-  // router.push(key);
-  console.log(key, keyPath);
+  // console.log(key, keyPath);
 };
 //处理关闭事件
 const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
+  // console.log(key, keyPath);
 };
+
 </script>
 
 
