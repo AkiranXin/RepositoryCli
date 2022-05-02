@@ -1,6 +1,6 @@
 <template lang="">
     <div class="loginPageDiv">
-      <el-form :rules="data.rules" class="login_form">
+      <el-form :rules="data.rules" class="login_form" v-loading="loginLoading">
         <el-header class="header">
           欢迎登录仓库管理系统
         </el-header>
@@ -56,11 +56,14 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { ElMessage, ElLoading } from "element-plus";
+import { useStore } from "vuex";
+
 export default {
   setup() {
     const router = useRouter();
     const dialogVisible = ref(false);
     const screenLoading = ref(false);
+    const loginLoading = ref(false);
     const disbutton = ref(false);
     const data = reactive({
       account: "",
@@ -71,7 +74,7 @@ export default {
       regi_email: "",
       regi_message: "",
     });
-
+    const store = useStore();
     //登录信息获取，用于判断和验证登录
     const getData = async () => {
       const res = await axios.get("http://localhost:8080/user/login", {
@@ -80,16 +83,28 @@ export default {
         },
       });
       if (res.data == "") {
-        ElMessage({
-          message: "账号不存在,请重新输入账号!",
-          type: "warning",
-        });
+        loginLoading.value = true;
+        setTimeout(() => {
+          loginLoading.value = false;
+          ElMessage({
+            message: "账号不存在,请重新输入账号!",
+            type: "warning",
+          });
+        }, 1000);
       } else if (
         res.data[0].user_account == data.account &&
         res.data[0].user_pwd == data.password
       ) {
         console.log("OK");
-        router.push({ path: "/main" });
+        //将权限给状态管理全局
+        store.commit("changeAuthority",{
+          authoriy: res.data[0].authority,
+        })
+        loginLoading.value = true;
+        setTimeout(() => {
+          loginLoading.value = false;
+          router.push({ path: "/main" });
+        }, 1000);
       } else {
         ElMessage({
           message: "密码错误！",
@@ -97,8 +112,6 @@ export default {
         });
       }
     };
-
-
 
     //登录按钮提交事件
     const onSubmit = () => {
@@ -115,10 +128,10 @@ export default {
       } else {
         getData();
       }
-    };    
+    };
     //注册用户信息
     const registry = async () => {
-      const res = await axios.get("http://localhost:8080/user/Registry", {
+      const res = await axios.get("http://localhost:8080/user/registry", {
         params: {
           user_account: data.regi_acc,
           user_pwd: data.regi_pwd,
@@ -126,10 +139,13 @@ export default {
           user_email: data.regi_email,
         },
       });
-      console.log(res);
+      //console.log(res);
+      //console.log(res.status);
+      //返回状态码用于完成后续判断
+      return res.status;
     };
     //注册按钮提交事件
-    const onRegit = () => {
+    const onRegit = async () => {
       if (data.regi_acc == "") {
         ElMessage({
           message: "账号不能为空",
@@ -151,16 +167,23 @@ export default {
           type: "error",
         });
       } else {
-        registry();
+        const res = await registry(); //异步接受状态码
         screenLoading.value = true;
         disbutton.value = true;
         setTimeout(() => {
           disbutton.value = false;
           screenLoading.value = false;
-          ElMessage({
-            message: "已提交注册申请，等待管理员审核",
-            type: "success",
-          });
+          if (res == 200) {
+            ElMessage({
+              message: "已提交注册申请，等待管理员审核",
+              type: "success",
+            });
+          } else {
+            ElMessage({
+              message: "出现错误，请等待管理员排查",
+              type: "error",
+            });
+          }
         }, 1500);
       }
     };
@@ -172,6 +195,7 @@ export default {
       onRegit,
       screenLoading,
       disbutton,
+      loginLoading,
     };
   },
 };
