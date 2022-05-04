@@ -34,7 +34,9 @@
               </template>
 
               <el-item-group>
-                <el-menu-item index="/userInfoManage">个人信息管理</el-menu-item>
+                <el-menu-item index="/selfInfoManage"
+                  >个人信息管理</el-menu-item
+                >
               </el-item-group>
             </el-sub-menu>
 
@@ -70,7 +72,7 @@
 
 
 <script lang="ts" setup>
-import { ref,computed } from "vue";
+import { ref, computed } from "vue";
 import {
   Document,
   Menu as IconMenu,
@@ -86,8 +88,13 @@ const store = useStore();
 
 //数据定义
 const data = reactive({
-  test: true,
+  user_account: "",
+  user_pwd: "",
+  user_name: "",
+  user_email: "",
+  authority: "",
 });
+
 //路由
 const router = useRouter();
 const isCollapse = ref(false);
@@ -99,7 +106,6 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   // console.log(key, keyPath);
 };
-
 </script>
 
 

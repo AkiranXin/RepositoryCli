@@ -533,6 +533,11 @@ prr@~1.0.1:
   resolved "https://repo.huaweicloud.com/repository/npm/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
   integrity sha1-0/wRS6BplaRexok/SEzrHXj19HY=
 
+resize-detector@^0.3.0:
+  version "0.3.0"
+  resolved "https://repo.huaweicloud.com/repository/npm/resize-detector/-/resize-detector-0.3.0.tgz#fe495112e184695500a8f51e0389f15774cb1cfc"
+  integrity sha512-R/tCuvuOHQ8o2boRP6vgx8hXCCy87H1eY9V5imBYeVNyNVpuL9ciReSccLj2gDcax9+2weXy3bc8Vv+NRXeEvQ==
+
 resolve@^1.22.0:
   version "1.22.0"
   resolved "https://repo.huaweicloud.com/repository/npm/resolve/-/resolve-1.22.0.tgz#5e0b8c67c15df57a89bdbabe603a002f21731198"
@@ -601,10 +606,18 @@ vite@^2.9.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vue-demi@*:
+vue-demi@*, vue-demi@^0.12.1:
   version "0.12.5"
   resolved "https://repo.huaweicloud.com/repository/npm/vue-demi/-/vue-demi-0.12.5.tgz#8eeed566a7d86eb090209a11723f887d28aeb2d1"
   integrity sha512-BREuTgTYlUr0zw0EZn3hnhC3I6gPWv+Kwh4MCih6QcAeaTlaIX0DwOVN0wHej7hSvDPecz4jygy/idsgKfW58Q==
+
+vue-echarts@^6.0.2:
+  version "6.0.2"
+  resolved "https://repo.huaweicloud.com/repository/npm/vue-echarts/-/vue-echarts-6.0.2.tgz#f6d65c4b328d246da9060ded07b83556c1bef09b"
+  integrity sha512-9xDokauJtAc389MNKbwi1I0VDmp4Y6ndAJTQ8T9K7H0ffosTe1OJSJbUtkT7/fVLDFzlCcmg2TfAKaMzbpg5yQ==
+  dependencies:
+    resize-detector "^0.3.0"
+    vue-demi "^0.12.1"
 
 vue-router@^4.0.14:
   version "4.0.14"

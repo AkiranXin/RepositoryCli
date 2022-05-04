@@ -9,7 +9,7 @@ const routes = [
         component: Test
     },
     {
-        path: '/',
+        path: '/login',
         name: 'Login',
         component: () => import('../pages/login.vue')
     },
@@ -24,29 +24,52 @@ const routes = [
                 component: () => import('../pages/infoManagePage/userInfoManage.vue'),
             },
             {
-                path: 'selfInfoManage',
-                name: '/selfInfoManage',
+                path: '/selfInfoManage',
+                name: 'selfInfoManage',
                 component: () => import('../pages/infoManagePage/selfInfoManage.vue'),
+            },
+            {
+                path: '/repoInfoManage',
+                name: 'repoInfoManage',
+                component: () => import('../pages/repoInfoManagePage/repoInfoManage.vue'),
             }
         ],
     },
 ]
 
-
-console.log(store);
-
+//定义router实体
 const router = createRouter({
     history: createWebHashHistory(),
     routes
 })
 
-// router.beforeEach((to, from) => {
-//     if (to.path === '/main') {
-//         store.state.hasPermission = ''
-//     } else if (to.path === '/userInfoManage') {
-//         store.state.hasPermission = '1'
-//     }
-//     return true
-// })
+//主要是用于登录判断
+/**
+ * 在每次进入一个页面之前，导航守卫进行判断
+ */
+router.beforeEach((to, from, next) => {
+    let isLogin = sessionStorage.getItem("account")
+    //这一步判断权限，保证刷新之后不会掉状态
+    //先判断store里面的，再判断localStora里面的，避免每次跳转都要获取数据
+    if (store.state.hasPermission == '') {
+        let isAuthority = sessionStorage.getItem("hasPermission")
+        if (isAuthority) {
+            store.commit("changeAuthority", {
+                authoriy: isAuthority
+            })
+        }
+    }
+    //这一步判断是否登录状态，如果有登陆状态就直接跳转
+    if (isLogin) {
+        next()
+    } else {
+        if (to.path === '/login') {
+            next()
+        } else {
+            next('/login')
+        }
+    }
+})
+
 
 export default router

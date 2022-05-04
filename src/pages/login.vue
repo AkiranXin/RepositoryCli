@@ -82,35 +82,40 @@ export default {
           user_account: data.account,
         },
       });
-      if (res.data == "") {
-        loginLoading.value = true;
-        setTimeout(() => {
-          loginLoading.value = false;
+      //loading一下优化下用户体验
+      loginLoading.value = true;
+      setTimeout(() => {
+        if (res.data == "") {
           ElMessage({
             message: "账号不存在,请重新输入账号!",
             type: "warning",
           });
-        }, 1000);
-      } else if (
-        res.data[0].user_account == data.account &&
-        res.data[0].user_pwd == data.password
-      ) {
-        console.log("OK");
-        //将权限给状态管理全局
-        store.commit("changeAuthority",{
-          authoriy: res.data[0].authority,
-        })
-        loginLoading.value = true;
-        setTimeout(() => {
-          loginLoading.value = false;
+        } else if (
+          res.data[0].user_account == data.account &&
+          res.data[0].user_pwd == data.password
+        ) {
+          console.log("OK");
+          //将权限给状态管理全局
+          store.commit("changeAuthority", {
+            authoriy: res.data[0].authority,
+          });
+          //存入本地缓存，用于判断是否还登录在线
+          sessionStorage.setItem("account", data.account);
+          sessionStorage.setItem("hasPermission", data.authority);
+          //路由跳转
           router.push({ path: "/main" });
-        }, 1000);
-      } else {
-        ElMessage({
-          message: "密码错误！",
-          type: "warning",
-        });
-      }
+          ElMessage({
+            message: "登录成功",
+            type: "success",
+          });
+        } else {
+          ElMessage({
+            message: "密码错误！",
+            type: "warning",
+          });
+        }
+        loginLoading.value = false;
+      }, 1000);
     };
 
     //登录按钮提交事件
@@ -126,6 +131,7 @@ export default {
           type: "error",
         });
       } else {
+        //若数据都填写上了，就想服务器发送请求
         getData();
       }
     };

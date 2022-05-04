@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        NoPermissions
+        
     </div>
 </template>
 <script>
