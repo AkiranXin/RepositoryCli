@@ -101,7 +101,8 @@ export default {
           });
           //存入本地缓存，用于判断是否还登录在线
           sessionStorage.setItem("account", data.account);
-          sessionStorage.setItem("hasPermission", data.authority);
+          sessionStorage.setItem("hasPermission", store.state.hasPermission);
+          sessionStorage.setItem("name", res.data[0].user_name)
           //路由跳转
           router.push({ path: "/main" });
           ElMessage({
@@ -137,18 +138,29 @@ export default {
     };
     //注册用户信息
     const registry = async () => {
-      const res = await axios.get("http://localhost:8080/user/registry", {
-        params: {
-          user_account: data.regi_acc,
-          user_pwd: data.regi_pwd,
-          user_name: data.regi_name,
-          user_email: data.regi_email,
-        },
-      });
-      //console.log(res);
+      const res = await axios
+        .get("http://localhost:8080/user/registry", {
+          params: {
+            user_account: data.regi_acc,
+            user_pwd: data.regi_pwd,
+            user_name: data.regi_name,
+            user_email: data.regi_email,
+          },
+        })
+        .catch(function (error) {
+          if (error.response) {
+            console.log(error.response.status);
+            return error.response.status
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+      // console.log(res);
       //console.log(res.status);
       //返回状态码用于完成后续判断
-      return res.status;
+      return res.data;
     };
     //注册按钮提交事件
     const onRegit = async () => {
@@ -179,10 +191,15 @@ export default {
         setTimeout(() => {
           disbutton.value = false;
           screenLoading.value = false;
-          if (res == 200) {
+          if (res == "注册成功") {
             ElMessage({
               message: "已提交注册申请，等待管理员审核",
               type: "success",
+            });
+          } else if(res == "重复注册"){
+              ElMessage({
+              message: "注册的账号已存在，请更换账号！",
+              type: "warning",
             });
           } else {
             ElMessage({

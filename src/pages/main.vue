@@ -3,9 +3,31 @@
     <el-container>
       <!-- 头部 -->
       <el-header>
-        <img class="logo" src="../assets/shiyou.jpg" />
-        <span class="title">仓库管理系统</span>
+        <div>
+          <img class="logo" src="../assets/shiyou.jpg" />
+          <span class="title">基于Vue和SpringBoot的仓库管理系统</span>
+        </div>
+
+        <div :style="{ display: 'flex', alignItems: 'center' }">
+          <el-dropdown trigger="hover" @command="handleCommand">
+            <span class="el-dropdown-link">
+              欢迎回来,{{ store.state.name }}
+              <el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item class="clearfix" command="setting">
+                  设置
+                </el-dropdown-item>
+                <el-dropdown-item class="clearfix" command="quit">
+                  注销
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-header>
+      <el-divider direction="horizontal"></el-divider>
       <el-container>
         <!-- 侧边菜单栏 -->
         <el-aside>
@@ -20,24 +42,27 @@
             :collapse="isCollapse"
             @open="handleOpen"
             @close="handleClose"
-            router="true"
+            :router="true"
           >
             <el-menu-item index="/main">
               <el-icon><icon-menu /></el-icon>
               <template #title>首页</template>
             </el-menu-item>
 
-            <el-sub-menu index="/InfoManage">
+            <el-sub-menu index="">
               <template #title>
                 <el-icon><location /></el-icon>
                 <span>信息管理</span>
               </template>
 
-              <el-item-group>
                 <el-menu-item index="/selfInfoManage"
                   >个人信息管理</el-menu-item
                 >
-              </el-item-group>
+              <template v-if="store.state.hasPermission == '0'">
+                <el-menu-item index="/userInfoManage">
+                  用户信息管理
+                </el-menu-item>
+              </template>
             </el-sub-menu>
 
             <el-menu-item index="/repoInfoManage">
@@ -66,6 +91,12 @@
           </template>
         </el-main>
       </el-container>
+      <el-divider direction="horizontal"></el-divider>
+      <el-footer>
+        <template>
+          <div>Hello world!</div>
+        </template>
+      </el-footer>
     </el-container>
   </div>
 </template>
@@ -80,11 +111,14 @@ import {
   Setting,
 } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+// import { useStore } from "vuex";
+import store from "../store";
 import { reactive } from "@vue/reactivity";
+import { ArrowDown } from "@element-plus/icons-vue";
+import { ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 
 //状态管理
-const store = useStore();
 
 //数据定义
 const data = reactive({
@@ -106,6 +140,15 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   // console.log(key, keyPath);
 };
+
+const handleCommand = (command: string | number | object) => {
+  if(command == 'setting'){
+    router.push('/selfInfoManage');
+  }else{
+    sessionStorage.clear();
+    router.go(0);
+  }
+}
 </script>
 
 
@@ -115,12 +158,34 @@ const handleClose = (key: string, keyPath: string[]) => {
   min-height: 400px;
 }
 
+.el-header {
+  display: flex;
+  justify-content: space-between;
+}
+
 .logo {
-  width: 60px;
+  width: 80px;
   margin-right: 10px;
 }
 .title {
-  font-size: 26px;
+  font-size: 24px;
   margin-left: 10px;
+  position: relative;
+  top: -18px;
+  width: auto;
+  display: inline-block;
+}
+
+.avatar {
+}
+
+.item {
+}
+.el-dropdown-link {
+  font-size: 18px;
+  margin-top: 10px;
+
+  display: inline-block;
+  cursor: pointer;
 }
 </style>

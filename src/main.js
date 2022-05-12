@@ -6,6 +6,8 @@ import router from './router'
 import { createStore } from "vuex";
 import store from './store'
 
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
 const app = createApp(App)
 
 app.use(store)

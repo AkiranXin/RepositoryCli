@@ -3,7 +3,8 @@ import { createStore, createLogger } from "vuex";
 const store = createStore({
     state: {
         hasPermission: "",//全局权限状态
-        isLogin: "" //登录状态
+        account: "", //登录状态
+        name:""
     },
     mutations: {
         //改变权限
@@ -11,8 +12,11 @@ const store = createStore({
             state.hasPermission = playload.authoriy;
         },
         //改变登录状态
-        changeLogin(state, playload){
-            state.isLogin = playload.isLogin;
+        changeAccount(state, playload){
+            state.account = playload.account;
+        },
+        changeName(state, playload){
+            state.name = playload.name;
         }
     }
 })

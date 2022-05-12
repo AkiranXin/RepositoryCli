@@ -30,6 +30,7 @@
   </el-card>
 </template>
 <script lang="ts" setup>
+
 import axios from "axios";
 import { onMounted } from "vue";
 import { reactive } from "vue-demi";
@@ -63,13 +64,11 @@ const getSelfInfo = async () => {
         console.log("error", error.message);
       }
     });
-    
   //不用在意，因为项目的模板用的不是ts的，所以会爆红
   data.user_account = res.data[0].user_account;
   data.user_name = res.data[0].user_name;
   data.user_email = res.data[0].user_email;
   data.authority = res.data[0].authority;
-
 };
 
 //页面装载时加载

@@ -32,7 +32,17 @@ const routes = [
                 path: '/repoInfoManage',
                 name: 'repoInfoManage',
                 component: () => import('../pages/repoInfoManagePage/repoInfoManage.vue'),
-            }
+            },
+            {
+                path: '/IOInfoManage',
+                name: 'IOInfoManage',
+                component: () => import('../pages/repoInfoManagePage/IOInfoManage.vue'),
+            },
+            {
+                path: '/productInfoManage',
+                name: 'productInfoManage',
+                component: () => import('../pages/repoInfoManagePage/productInfoManage.vue'),
+            },
         ],
     },
 ]
@@ -56,6 +66,12 @@ router.beforeEach((to, from, next) => {
         if (isAuthority) {
             store.commit("changeAuthority", {
                 authoriy: isAuthority
+            })
+            store.commit("changeAccount", {
+                account: sessionStorage.getItem("account")
+            })
+            store.commit("changeName",{
+                name: sessionStorage.getItem("name")
             })
         }
     }
