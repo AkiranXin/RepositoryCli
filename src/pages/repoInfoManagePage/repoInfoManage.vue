@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        
+        HelloWOrld!
     </div>
 </template>
 <script>

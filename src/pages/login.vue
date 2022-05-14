@@ -139,12 +139,13 @@ export default {
     //注册用户信息
     const registry = async () => {
       const res = await axios
-        .get("http://localhost:8080/user/registry", {
+        .get("http://localhost:8080/user/registryRedis", {
           params: {
             user_account: data.regi_acc,
             user_pwd: data.regi_pwd,
             user_name: data.regi_name,
             user_email: data.regi_email,
+            authority: 2,
           },
         })
         .catch(function (error) {

@@ -29,6 +29,11 @@ const routes = [
                 component: () => import('../pages/infoManagePage/selfInfoManage.vue'),
             },
             {
+                path: '/validateInfo',
+                name: 'validateInfo',
+                component: () => import('../pages/infoManagePage/validateInfo.vue'),
+            },
+            {
                 path: '/repoInfoManage',
                 name: 'repoInfoManage',
                 component: () => import('../pages/repoInfoManagePage/repoInfoManage.vue'),

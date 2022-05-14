@@ -28,7 +28,7 @@
         </div>
       </el-header>
       <el-divider direction="horizontal"></el-divider>
-      <el-container>
+      <el-container class="mainPage">
         <!-- 侧边菜单栏 -->
         <el-aside>
           <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
@@ -58,9 +58,14 @@
                 <el-menu-item index="/selfInfoManage"
                   >个人信息管理</el-menu-item
                 >
-              <template v-if="store.state.hasPermission == '0'">
+              <template v-if="auth == 0">
                 <el-menu-item index="/userInfoManage">
                   用户信息管理
+                </el-menu-item>
+              </template>
+              <template v-if="auth <= 1">
+                <el-menu-item index="/validateInfo">
+                  用户注册审核
                 </el-menu-item>
               </template>
             </el-sub-menu>
@@ -84,11 +89,8 @@
         <!-- 这里就是主体页面跳转 -->
         <el-main>
           <!-- 权限（状态管理） -->
-          <template v-if="store.state.hasPermission == ''">没有权限</template>
-          <template v-else>
             <!-- 主体页面部分跳转路由 -->
             <router-view></router-view>
-          </template>
         </el-main>
       </el-container>
       <el-divider direction="horizontal"></el-divider>
@@ -129,6 +131,16 @@ const data = reactive({
   authority: "",
 });
 
+const auth = computed(()=>{
+  if(store.state.hasPermission == '0'){
+    return 0
+  }else if(store.state.hasPermission == '1'){
+    return 1
+  }else{
+    return 2
+  }
+})
+
 //路由
 const router = useRouter();
 const isCollapse = ref(false);
@@ -153,6 +165,10 @@ const handleCommand = (command: string | number | object) => {
 
 
 <style>
+.mainPage{
+  height: 750px;
+}
+
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 200px;
   min-height: 400px;

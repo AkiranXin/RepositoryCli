@@ -20,9 +20,9 @@
       </div>
       <div>
         <span class="left_text">当前账户拥有的权限：</span>
-          <span class="right_text" v-if="store.state.authority='0'">Administrator</span>
-          <span class="right_text" v-else-if="store.state.authority='1'">管理者</span>
-          <span class="right_text" v-else>普通用户</span>
+        <span class="right_text" v-if="store.state.authority='0'">超级管理员</span>
+        <span class="right_text" v-else-if="store.state.authority='1'">管理者</span>
+        <span class="right_text" v-else>普通用户</span>
       </div>
     </div>
     <el-divider direction="horizontal" content-position="left"></el-divider>
