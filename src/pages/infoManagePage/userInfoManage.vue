@@ -5,27 +5,30 @@
             <el-table-column prop="user_pwd" label="密码" width="180" />
             <el-table-column prop="user_name" label="用户名" width="180" />
             <el-table-column prop="user_email" label="邮箱" width="180" />
-            <el-table-column prop="authority" label="权限" width="180" />
+            <el-table-column prop="authority" label="权限" width="180">
+               <template #default="scope">
+               {{optionsDetail[scope.row.authority]}}</template>
+             </el-table-column >
             <el-table-column align="right">
               <template #header>
-                <el-input v-model="search" placeholder="Type to search account"  clearable/>
-              </template>
+  <el-input v-model="search" placeholder="Type to search account" clearable />
+</template>
               <template #default="scope">
-              <el-button
-                size="large"
-                round
-                type="primary"
-                @click="handleEdit(scope.$index, scope.row)"
-                >修改</el-button
-              >
-              <el-button
-                size="large"
-                round
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)"
-                >删除</el-button
-              >
-            </template>
+  <el-button
+    size="large"
+    round
+    type="primary"
+    @click="handleEdit(scope.$index, scope.row)"
+    >修改</el-button
+  >
+  <el-button
+    size="large"
+    round
+    type="danger"
+    @click="handleDelete(scope.$index, scope.row)"
+    >删除</el-button
+  >
+</template>
             </el-table-column>
         </el-table>
     </div>
@@ -97,6 +100,7 @@ import {
   toRefs,
 } from "vue-demi";
 import store from "../../store";
+import router from "../../router";
 
 //用户数据, 临时存储, 用了ts的类型限定
 interface User {
@@ -135,7 +139,7 @@ const currentData = reactive<User>({
   user_name: "",
   user_email: "",
   authority: "",
-})
+});
 
 const EditData = reactive<User>({
   user_account: "",
@@ -143,7 +147,7 @@ const EditData = reactive<User>({
   user_name: "",
   user_email: "",
   authority: "",
-})
+});
 
 //搜索框
 const search = ref("");
@@ -159,26 +163,27 @@ const disbutton = ref(false);
 const options = [
   {
     value: 0,
-    label: '超级管理员',
+    label: "超级管理员",
   },
   {
     value: 1,
-    label: '管理员',
+    label: "管理员",
   },
   {
     value: 2,
-    label: '普通用户'
-  }
-]
-
-const computedData = computed((str: string)=>{
-  if(str == '超级管理员')
-    return 0
-  else if(str == '管理员')
-    return 1
-  else
-    return 2
-})
+    label: "普通用户",
+  },
+];
+const optionsDetail = {
+  "0": "超级管理员",
+  "1": "管理员",
+  "2": "普通用户",
+};
+const computedData = computed((str: string) => {
+  if (str == "超级管理员") return 0;
+  else if (str == "管理员") return 1;
+  else return 2;
+});
 
 //处理修改按钮点击事件
 const handleEdit = (index: number, row: User) => {
@@ -196,23 +201,23 @@ const handleEdit = (index: number, row: User) => {
   EditData.authority = row.authority;
 };
 
-const commitDelete = async () =>{
-  ElMessageBox.confirm('确定删除修改数据?')
-    .then(async ()=>{
-      const res = await axios.get("http://localhost:8080/user/deleteUser",{
-        params:{
-          user_account: currentData.user_account,
-        }
-      })
-      console.log(res);
-      disbutton.value = true;
-      EditLoading.value = true;
-      setTimeout(()=>{
-        disbutton.value = false;
-        EditLoading.value = false;
-      }, 750)
-    })
-}
+const commitDelete = async () => {
+  ElMessageBox.confirm("确定删除数据?").then(async () => {
+    const res = await axios.get("http://localhost:8080/user/deleteUser", {
+      params: {
+        user_account: currentData.user_account,
+      },
+    });
+    console.log(res);
+    disbutton.value = true;
+    EditLoading.value = true;
+    setTimeout(() => {
+      disbutton.value = false;
+      EditLoading.value = false;
+      router.go(0);
+    }, 750);
+  });
+};
 
 //处理删除按钮点击事件
 const handleDelete = (index: number, row: User) => {
@@ -223,7 +228,7 @@ const handleDelete = (index: number, row: User) => {
   currentData.user_name = row.user_name;
   currentData.user_email = row.user_email;
   currentData.authority = row.authority;
-  commitDelete()
+  commitDelete();
 };
 //处理pageNavigation的点击事件，用于分页跳转
 const handleCurrentPage = (val: number) => {
@@ -247,67 +252,68 @@ const getUserData = async () => {
   pageInfo.totalPage = pageData.completeData.length * 10;
 };
 
-const sendUpdateInfo = async ()=>{
-  const res = await axios.get("http://localhost:8080/user/updateUser",{
-    params:{
-      user_account: EditData.user_account,
-      user_pwd: EditData.user_pwd,
-      user_name: EditData.user_name,
-      user_email: EditData.user_email,
-      authority: EditData.authority,
-    }
-  })
-  .catch(function (error) {
-  if (error.response) {
-    console.log(error.response.status);
-    return error.response.status
-  } else if (error.request) {
-    console.log(error.request);
-  } else {
-    console.log("Error", error.message);
-  }
-  });
+const sendUpdateInfo = async () => {
+  const res = await axios
+    .get("http://localhost:8080/user/updateUser", {
+      params: {
+        user_account: EditData.user_account,
+        user_pwd: EditData.user_pwd,
+        user_name: EditData.user_name,
+        user_email: EditData.user_email,
+        authority: EditData.authority,
+      },
+    })
+    .catch(function (error) {
+      if (error.response) {
+        console.log(error.response.status);
+        return error.response.status;
+      } else if (error.request) {
+        console.log(error.request);
+      } else {
+        console.log("Error", error.message);
+      }
+    });
   // console.log(res);
   //console.log(res.status);
   //返回状态码用于完成后续判断
   return res.data;
-}
+};
 
-const UpdateInfo = async (done: () => void) =>{
-  console.log(EditData)
-  ElMessageBox.confirm('确定提交修改数据?')
-    .then( async ()=>{
-      const res = await sendUpdateInfo()
+const UpdateInfo = async (done: () => void) => {
+  console.log(EditData);
+  ElMessageBox.confirm("确定提交修改数据?")
+    .then(async () => {
+      const res = await sendUpdateInfo();
       EditLoading.value = true;
       disbutton.value = true;
-      setTimeout(()=>{
-        if(res == '修改成功'){
+      setTimeout(() => {
+        if (res == "修改成功") {
           ElMessageBox({
-            message: '修改成功',
-            type:'success',
-          })
-        }else{
+            message: "修改成功",
+            type: "success",
+          });
+        } else {
           ElMessageBox({
-            message: '修改失败',
-            type:'error',
-          })
+            message: "修改失败",
+            type: "error",
+          });
         }
         EditLoading.value = false;
         disbutton.value = false;
-      }, 750)
-      done()
+      }, 750);
+      done();
     })
-    .catch(()=>{
+    .catch(() => {
       console.log(Error);
-    })
-}
+    });
+};
 
 onMounted(() => {
   getUserData();
 });
 </script>
 <style>
-.edit_input{
+.edit_input {
   margin: 0 auto;
 }
 </style>

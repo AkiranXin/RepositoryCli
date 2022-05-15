@@ -26,13 +26,12 @@
       </div>
     </div>
     <el-divider direction="horizontal" content-position="left"></el-divider>
-    <el-button type="primary" size="default" @click="">修改</el-button>
   </el-card>
 </template>
 <script lang="ts" setup>
 
 import axios from "axios";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { reactive } from "vue-demi";
 // import { useStore } from "vuex";
 import store from "../../store";
@@ -45,6 +44,13 @@ const data = reactive({
   user_email: "",
   authority: "",
 });
+
+//修改用的数据
+const commitData = reactive({
+  user_account: "",
+  user_pwd: "",
+  user_email: "",
+})
 
 const getSelfInfo = async () => {
   const res = await axios
@@ -98,5 +104,9 @@ onMounted(() => {
 }
 .right_text{
   /* margin-left: 150px; */
+}
+.commit_div{
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

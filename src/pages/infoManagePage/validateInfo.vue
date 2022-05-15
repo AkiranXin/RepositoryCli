@@ -5,7 +5,11 @@
             <el-table-column prop="user_pwd" label="密码" width="180" />
             <el-table-column prop="user_name" label="用户名" width="180" />
             <el-table-column prop="user_email" label="邮箱" width="180" />
-            <el-table-column prop="authority" label="权限" width="180" />
+            <el-table-column prop="authority" label="权限" width="180">
+              <template #default="scope">
+               {{optionsDetail[scope.row.authority]}}
+               </template>
+            </el-table-column>
             <el-table-column align="right">
               <template #header>
                 <el-input v-model="search" placeholder="Type to search account" clearable/>
@@ -52,6 +56,7 @@ import {
   toRef,
   toRefs,
 } from "vue-demi";
+import router from "../../router";
 import store from "../../store";
 
 //用户数据, 临时存储, 用了ts的类型限定
@@ -68,6 +73,14 @@ interface IData {
 const data = reactive<IData>({
   tableData: [],
 });
+
+const currentData = reactive<User>({
+  user_account: "",
+  user_pwd: "",
+  user_name: "",
+  user_email: "",
+  authority: "",
+})
 
 //页面数据，用于分页
 /**
@@ -88,6 +101,12 @@ const pageData = reactive({
 //搜索框
 const search = ref("");
 
+const optionsDetail = {
+  "0": "超级管理员",
+  "1": "管理员",
+  "2": "普通用户",
+};
+
 const onUserRedis = async ()=>{
     const res = await axios.get("http://localhost:8080/user/getUserRedis")
     console.log(res);
@@ -101,16 +120,62 @@ const onUserRedis = async ()=>{
     pageInfo.totalPage = pageData.completeData.length * 10;
 }
 
+const commitPush = async ()=>{
+  ElMessageBox.confirm('确定通过注册?')
+    .then(async ()=>{
+      const res = await axios.get("http://localhost:8080/user/registry",{
+        params:{
+          user_account: currentData.user_account,
+          user_pwd: currentData.user_pwd,
+          user_name: currentData.user_name,
+          user_email: currentData.user_email,
+          authority: currentData.authority
+        }
+      })
+      //刷新页面，路由方法
+      router.go(0);
+      console.log(res);
+    })
+}
+
 //处理通过按钮点击事件
 const handleEdit = (index: number, row: User) => {
   console.log(index, row);
-  
+  currentData.user_account = row.user_account;
+  currentData.user_pwd = row.user_pwd;
+  currentData.user_name = row.user_name;
+  currentData.user_email = row.user_email;
+  currentData.authority = row.authority;
+  commitPush();
 };
+
+const commitDelete = async () =>{
+  ElMessageBox.confirm('确定删除数据?')
+    .then(async ()=>{
+      const res = await axios.get("http://localhost:8080/user/DeleteUserRedis",{
+        params:{
+          user_account: currentData.user_account,
+          user_pwd: currentData.user_pwd,
+          user_name: currentData.user_name,
+          user_email: currentData.user_email,
+          authority: currentData.authority
+        }
+      })
+      //刷新页面，路由方法
+      router.go(0);
+      console.log(res);
+    })
+}
 
 //处理删除按钮点击事件
 const handleDelete = (index: number, row: User) => {
   console.log(index, row);
-
+  currentData.user_account = row.user_account;
+  currentData.user_pwd = row.user_pwd;
+  currentData.user_name = row.user_name;
+  currentData.user_email = row.user_email;
+  currentData.authority = row.authority;
+  commitDelete();
 };
 
 
