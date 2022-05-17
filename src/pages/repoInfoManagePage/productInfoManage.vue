@@ -10,19 +10,17 @@
             <el-table-column prop="product_vendor" label="商品供货商" width="180" />
             <el-table-column align="right">
               <template #header>
-                <el-input v-model="search" style="width: 200px" placeholder="Type to search account" clearable/>
+                <el-input v-model="search" style="width: 400px" placeholder="Type to search account" clearable/>
                 <el-button type="primary" style="margin-left: 10px" @Click="searchFun">搜 索</el-button>
               </template>
               <template #default="scope">
   <el-button
-    size="large"
     round
     type="primary"
     @click="handleEdit(scope.$index, scope.row)"
     >修 改</el-button
   >
   <el-button
-    size="large"
     round
     type="danger"
     @click="handleDelete(scope.$index, scope.row)"
@@ -321,7 +319,6 @@ const switchFun = () => {
 };
 
 const searchFun = async () => {
-  
   const res = await axios({
     url: "http://localhost:8080/product/searchByName",
     method: "GET",
