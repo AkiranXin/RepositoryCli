@@ -1,13 +1,13 @@
 <template lang="">
     <div>
-        <el-button type="primary" @Click="openDialog">新增商品</el-button>
+        <el-button type="primary" @Click="openDialog">新增货物</el-button>
         <el-table :data="pageData.completeData[pageInfo.currentPage]" stripe>
             <el-table-column type="selection" width="55" />
-            <el-table-column prop="product_id" label="商品ID" width="180" />
-            <el-table-column prop="product_name" label="商品名字" width="180" />
-            <el-table-column prop="product_catgory" label="商品类别" width="180" />
-            <el-table-column prop="product_price" label="商品价格" width="180" />
-            <el-table-column prop="product_vendor" label="商品供货商" width="180" />
+            <el-table-column prop="product_id" label="货物ID" width="180" />
+            <el-table-column prop="product_name" label="货物名字" width="180" />
+            <el-table-column prop="product_catgory" label="货物类别" width="180" />
+            <el-table-column prop="product_price" label="货物价格" width="180" />
+            <el-table-column prop="product_vendor" label="货物供货商" width="180" />
             <el-table-column align="right">
               <template #header>
                 <el-input v-model="search" style="width: 400px" placeholder="Type to search account" clearable/>
@@ -39,18 +39,18 @@
     </div>
     
     <el-dialog
-      title="商品信息"
+      title="货物信息"
       v-model="editView"
       width="30%">
-      <el-form v-loading="EditLoading">
+      <el-form v-loading="EditLoading" label-width="150px">
         <el-form-item>
-          <el-input class="edit_input" v-model="EditData.product_name" placeholder="商品名:" maxlength="20" minlength="6" show-word-limit clearable></el-input>
+          <el-input class="edit_input" v-model="EditData.product_name" placeholder="货物名:" maxlength="50" minlength="6" show-word-limit clearable></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input class="edit_input" v-model="EditData.product_catgory" placeholder="商品类别" maxlength="30" minlength="6" show-word-limit clearable></el-input>
+          <el-input class="edit_input" v-model="EditData.product_catgory" placeholder="货物类别" maxlength="30" minlength="6" show-word-limit clearable></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input class="edit_input" v-model="EditData.product_vendor" placeholder="供货商" maxlength="30" minlength="6" show-word-limit  clearable></el-input>
+          <el-input class="edit_input" v-model="EditData.product_vendor" placeholder="供货商" maxlength="50" minlength="6" show-word-limit  clearable></el-input>
         </el-form-item>      
         <el-form-item>
           <el-input class="edit_input" v-model="EditData.product_price" placeholder="产品价格" maxlength="30" minlength="6" show-word-limit clearable></el-input>
@@ -156,6 +156,11 @@ const UpdateProduct = async () => {
 };
 
 const handleEdit = (index: number, row: Product) => {
+  EditData.product_id = row.product_id;
+  EditData.product_name = row.product_name;
+  EditData.product_catgory = row.product_catgory;
+  EditData.product_vendor = row.product_vendor;
+  EditData.product_price = row.product_price;
   currentData.product_id = row.product_id;
   currentData.product_name = row.product_name;
   currentData.product_catgory = row.product_catgory;

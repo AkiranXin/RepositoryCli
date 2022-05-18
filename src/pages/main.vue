@@ -30,34 +30,35 @@
       <el-divider direction="horizontal"></el-divider>
       <el-container class="mainPage">
         <!-- 侧边菜单栏 -->
-        <el-aside>
-          <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
+        <el-aside class="menu-side" >
+          <!-- <el-radio-group v-model="isCollapse" fill='#d4237a' style="width: 199px;background-color: #545c64;box-sizing: border-box;padding: 12px 20px;">
             <el-radio-button :label="false">展开</el-radio-button>
             <el-radio-button :label="true">折叠</el-radio-button>
-          </el-radio-group>
-
+          </el-radio-group> -->
+          <div>
           <el-menu
             default-active="2"
+            style="height:calc(100vh - 163px)"
             class="el-menu-vertical-demo"
             :collapse="isCollapse"
+            background-color="#545c64"
+            text-color="#fff"
+            active-text-color="#ffd04b"
             @open="handleOpen"
             @close="handleClose"
             :router="true"
           >
-            <el-menu-item index="/main">
+            <el-menu-item index="/MainPage">
               <el-icon><icon-menu /></el-icon>
               <template #title>首页</template>
             </el-menu-item>
 
-            <el-sub-menu index="">
+            <el-sub-menu index="1">
               <template #title>
                 <el-icon><location /></el-icon>
                 <span>信息管理</span>
               </template>
-
-                <el-menu-item index="/selfInfoManage"
-                  >个人信息管理</el-menu-item
-                >
+              <el-menu-item index="/selfInfoManage">个人信息管理</el-menu-item>
               <template v-if="auth == 0">
                 <el-menu-item index="/userInfoManage">
                   用户信息管理
@@ -70,35 +71,37 @@
               </template>
             </el-sub-menu>
 
-            <el-menu-item index="/repoInfoManage">
-              <el-icon><setting /></el-icon>
-              <template #title>仓库信息管理</template>
-            </el-menu-item>
+            <el-sub-menu index="2">
+              <template #title>
+                <el-icon><User /></el-icon>
+                <span>出入库信息管理</span>
+              </template>
+              <el-menu-item index="/InputManage"> 入库管理 </el-menu-item>
 
-            <el-menu-item index="/IOInfoManage">
-              <el-icon></el-icon>
-              <template #title>出入库信息管理</template>
-            </el-menu-item>
+              <el-menu-item index="/OutputManage"> 出库管理 </el-menu-item>
+            </el-sub-menu>
+
+            <template v-if="auth <= 1">
+              <el-menu-item index="/repoInfoManage">
+                <el-icon><setting /></el-icon>
+                <template #title>仓库信息管理</template>
+              </el-menu-item>
+            </template>
 
             <el-menu-item index="/productInfoManage">
-              <el-icon></el-icon>
-              <template #title>商品信息管理</template>
+              <el-icon><ShoppingBag /></el-icon>
+              <template #title>货物信息管理</template>
             </el-menu-item>
           </el-menu>
+          </div>
         </el-aside>
         <!-- 这里就是主体页面跳转 -->
         <el-main>
           <!-- 权限（状态管理） -->
-            <!-- 主体页面部分跳转路由 -->
-            <router-view></router-view>
+          <!-- 主体页面部分跳转路由 -->
+          <router-view></router-view>
         </el-main>
       </el-container>
-      <el-divider direction="horizontal"></el-divider>
-      <el-footer>
-        <template>
-          <div>Hello world!</div>
-        </template>
-      </el-footer>
     </el-container>
   </div>
 </template>
@@ -131,15 +134,15 @@ const data = reactive({
   authority: "",
 });
 
-const auth = computed(()=>{
-  if(store.state.hasPermission == '0'){
-    return 0
-  }else if(store.state.hasPermission == '1'){
-    return 1
-  }else{
-    return 2
+const auth = computed(() => {
+  if (store.state.hasPermission == "0") {
+    return 0;
+  } else if (store.state.hasPermission == "1") {
+    return 1;
+  } else {
+    return 2;
   }
-})
+});
 
 //路由
 const router = useRouter();
@@ -154,19 +157,26 @@ const handleClose = (key: string, keyPath: string[]) => {
 };
 
 const handleCommand = (command: string | number | object) => {
-  if(command == 'setting'){
-    router.push('/selfInfoManage');
-  }else{
+  if (command == "setting") {
+    router.push("/selfInfoManage");
+  } else {
     sessionStorage.clear();
     router.go(0);
   }
-}
+};
 </script>
 
 
 <style>
-.mainPage{
-  height: 750px;
+*{
+  padding: 0;
+  margin: 0;
+}
+.common-layout{
+  height: 100vh;
+}
+.mainPage {
+  height: 700px;
 }
 
 .el-menu-vertical-demo:not(.el-menu--collapse) {
@@ -203,5 +213,8 @@ const handleCommand = (command: string | number | object) => {
 
   display: inline-block;
   cursor: pointer;
+}
+.menu-side{
+  overflow: inherit;
 }
 </style>

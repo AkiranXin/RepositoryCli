@@ -1,14 +1,15 @@
 <template lang="">
     <div class="loginPageDiv">
-      <el-form :rules="data.rules" class="login_form" v-loading="loginLoading">
+      <el-form :rules="data.rules" class="login_form" v-loading="loginLoading"
+      >
         <el-header class="header">
           欢迎登录仓库管理系统
         </el-header>
-        <el-form-item label="">
-          <el-input class="login_input" v-model="data.account" placeholder="账号：" clearable ></el-input>
+        <el-form-item >
+          <el-input class="login_input" v-model="data.account" placeholder="账号" clearable ></el-input>
         </el-form-item>
-        <el-form-item label="">
-          <el-input class="login_input" v-model="data.password" placeholder="密码：" show-password clearable ></el-input>
+        <el-form-item >
+          <el-input class="login_input" v-model="data.password" placeholder="密码" show-password clearable ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="onSubmit" class="btn" type="primary">登录</el-button>
@@ -50,178 +51,168 @@
   </el-dialog>
     
 </template>
-<script>
+<script lang="ts" setup>
 import { reactive } from "@vue/reactivity";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { ElMessage, ElLoading } from "element-plus";
 import { useStore } from "vuex";
+import { method } from "lodash";
 
-export default {
-  setup() {
-    const router = useRouter();
-    const dialogVisible = ref(false);
-    const screenLoading = ref(false);
-    const loginLoading = ref(false);
-    const disbutton = ref(false);
-    const data = reactive({
-      account: "",
-      password: "",
-      regi_acc: "",
-      regi_name: "",
-      regi_pwd: "",
-      regi_email: "",
-      regi_message: "",
-    });
-    const store = useStore();
-    //登录信息获取，用于判断和验证登录
-    const getData = async () => {
-      const res = await axios.get("http://localhost:8080/user/login", {
-        params: {
-          user_account: data.account,
-        },
+const router = useRouter();
+const dialogVisible = ref(false);
+const screenLoading = ref(false);
+const loginLoading = ref(false);
+const disbutton = ref(false);
+const data = reactive({
+  account: "",
+  password: "",
+  regi_acc: "",
+  regi_name: "",
+  regi_pwd: "",
+  regi_email: "",
+  regi_message: "",
+});
+
+
+
+const store = useStore();
+//登录信息获取，用于判断和验证登录
+const getData = async () => {
+  const res = await axios.get("http://localhost:8080/user/login", {
+    params: {
+      user_account: data.account,
+    },
+  });
+  //loading一下优化下用户体验
+  loginLoading.value = true;
+  setTimeout(() => {
+    if (res.data == "") {
+      ElMessage({
+        message: "账号不存在,请重新输入账号!",
+        type: "warning",
       });
-      //loading一下优化下用户体验
-      loginLoading.value = true;
-      setTimeout(() => {
-        if (res.data == "") {
-          ElMessage({
-            message: "账号不存在,请重新输入账号!",
-            type: "warning",
-          });
-        } else if (
-          res.data[0].user_account == data.account &&
-          res.data[0].user_pwd == data.password
-        ) {
-          console.log("OK");
-          //将权限给状态管理全局
-          store.commit("changeAuthority", {
-            authoriy: res.data[0].authority,
-          });
-          //存入本地缓存，用于判断是否还登录在线
-          sessionStorage.setItem("account", data.account);
-          sessionStorage.setItem("hasPermission", store.state.hasPermission);
-          sessionStorage.setItem("name", res.data[0].user_name)
-          //路由跳转
-          router.push({ path: "/main" });
-          ElMessage({
-            message: "登录成功",
-            type: "success",
-          });
-        } else {
-          ElMessage({
-            message: "密码错误！",
-            type: "warning",
-          });
-        }
-        loginLoading.value = false;
-      }, 1000);
-    };
+    } else if (
+      res.data[0].user_account == data.account &&
+      res.data[0].user_pwd == data.password
+    ) {
+      console.log("OK");
+      //将权限给状态管理全局
+      store.commit("changeAuthority", {
+        authoriy: res.data[0].authority,
+      });
+      //存入本地缓存，用于判断是否还登录在线
+      sessionStorage.setItem("account", data.account);
+      sessionStorage.setItem("hasPermission", store.state.hasPermission);
+      sessionStorage.setItem("name", res.data[0].user_name);
+      //路由跳转
+      router.push({ path: "/main" });
+      ElMessage({
+        message: "登录成功",
+        type: "success",
+      });
+    } else {
+      ElMessage({
+        message: "密码错误！",
+        type: "warning",
+      });
+    }
+    loginLoading.value = false;
+  }, 1000);
+};
 
-    //登录按钮提交事件
-    const onSubmit = () => {
-      if (data.account == "") {
+//登录按钮提交事件
+const onSubmit = () => {
+  if (data.account == "") {
+    ElMessage({
+      message: "账号不能为空",
+      type: "error",
+    });
+  } else if (data.password == "") {
+    ElMessage({
+      message: "密码不能为空",
+      type: "error",
+    });
+  } else {
+    //若数据都填写上了，就想服务器发送请求
+    getData();
+  }
+};
+//注册用户信息
+const registry = async () => {
+  const res = await axios
+    .get("http://localhost:8080/user/registryRedis", {
+      params: {
+        user_account: data.regi_acc,
+        user_pwd: data.regi_pwd,
+        user_name: data.regi_name,
+        user_email: data.regi_email,
+        authority: 2,
+      },
+    })
+    .catch(function (error) {
+      if (error.response) {
+        console.log(error.response.status);
+        return error.response.status;
+      } else if (error.request) {
+        console.log(error.request);
+      } else {
+        console.log("Error", error.message);
+      }
+    });
+  // console.log(res);
+  //console.log(res.status);
+  //返回状态码用于完成后续判断
+  return res.data;
+};
+//注册按钮提交事件
+const onRegit = async () => {
+  if (data.regi_acc == "") {
+    ElMessage({
+      message: "账号不能为空",
+      type: "error",
+    });
+  } else if (data.regi_pwd == "") {
+    ElMessage({
+      message: "密码不能为空",
+      type: "error",
+    });
+  } else if (data.regi_name == "") {
+    ElMessage({
+      message: "用户名不能为空",
+      type: "error",
+    });
+  } else if (data.regi_email == "") {
+    ElMessage({
+      message: "邮箱不能为空",
+      type: "error",
+    });
+  } else {
+    const res = await registry(); //异步接受状态码
+    screenLoading.value = true;
+    disbutton.value = true;
+    setTimeout(() => {
+      disbutton.value = false;
+      screenLoading.value = false;
+      if (res == "注册成功") {
         ElMessage({
-          message: "账号不能为空",
-          type: "error",
+          message: "已提交注册申请，等待管理员审核",
+          type: "success",
         });
-      } else if (data.password == "") {
+      } else if (res == "重复注册") {
         ElMessage({
-          message: "密码不能为空",
-          type: "error",
+          message: "注册的账号已存在，请更换账号！",
+          type: "warning",
         });
       } else {
-        //若数据都填写上了，就想服务器发送请求
-        getData();
+        ElMessage({
+          message: "出现错误，请等待管理员排查",
+          type: "error",
+        });
       }
-    };
-    //注册用户信息
-    const registry = async () => {
-      const res = await axios
-        .get("http://localhost:8080/user/registryRedis", {
-          params: {
-            user_account: data.regi_acc,
-            user_pwd: data.regi_pwd,
-            user_name: data.regi_name,
-            user_email: data.regi_email,
-            authority: 2,
-          },
-        })
-        .catch(function (error) {
-          if (error.response) {
-            console.log(error.response.status);
-            return error.response.status
-          } else if (error.request) {
-            console.log(error.request);
-          } else {
-            console.log("Error", error.message);
-          }
-        });
-      // console.log(res);
-      //console.log(res.status);
-      //返回状态码用于完成后续判断
-      return res.data;
-    };
-    //注册按钮提交事件
-    const onRegit = async () => {
-      if (data.regi_acc == "") {
-        ElMessage({
-          message: "账号不能为空",
-          type: "error",
-        });
-      } else if (data.regi_pwd == "") {
-        ElMessage({
-          message: "密码不能为空",
-          type: "error",
-        });
-      } else if (data.regi_name == "") {
-        ElMessage({
-          message: "用户名不能为空",
-          type: "error",
-        });
-      } else if (data.regi_email == "") {
-        ElMessage({
-          message: "邮箱不能为空",
-          type: "error",
-        });
-      } else {
-        const res = await registry(); //异步接受状态码
-        screenLoading.value = true;
-        disbutton.value = true;
-        setTimeout(() => {
-          disbutton.value = false;
-          screenLoading.value = false;
-          if (res == "注册成功") {
-            ElMessage({
-              message: "已提交注册申请，等待管理员审核",
-              type: "success",
-            });
-          } else if(res == "重复注册"){
-              ElMessage({
-              message: "注册的账号已存在，请更换账号！",
-              type: "warning",
-            });
-          } else {
-            ElMessage({
-              message: "出现错误，请等待管理员排查",
-              type: "error",
-            });
-          }
-        }, 1500);
-      }
-    };
-
-    return {
-      data,
-      onSubmit,
-      dialogVisible,
-      onRegit,
-      screenLoading,
-      disbutton,
-      loginLoading,
-    };
-  },
+    }, 1500);
+  }
 };
 </script>
 <style>

@@ -1,6 +1,7 @@
 <template lang="">
     <div>
         <el-table :data="pageData.completeData[pageInfo.currentPage]" stripe>
+            <el-table-column type="selection" width="55" />
             <el-table-column prop="user_account" label="账号" width="180" />
             <el-table-column prop="user_pwd" label="密码" width="180" />
             <el-table-column prop="user_name" label="用户名" width="180" />
@@ -12,13 +13,13 @@
             </el-table-column>
             <el-table-column align="right">
               <template #header>
-                <el-input v-model="search" placeholder="Type to search account" clearable/>
+                <!-- <el-input v-model="search" placeholder="Type to search account" clearable/> -->
               </template>
               <template #default="scope">
               <el-button
                 size="large"
                 round
-                type="primary"
+                type="warning"
                 @click="handleEdit(scope.$index, scope.row)"
                 >通过</el-button
               >
@@ -44,7 +45,7 @@
 import { User } from "@element-plus/icons-vue/dist/types";
 import { DOMNodeTransforms } from "@vue/compiler-dom";
 import axios from "axios";
-import { ElLoading, ElMessageBox } from "element-plus";
+import { ElLoading, ElMessageBox, ElTable } from "element-plus";
 import { fa, tr } from "element-plus/lib/locale";
 import { serve } from "esbuild";
 import {

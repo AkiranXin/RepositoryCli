@@ -38,6 +38,7 @@
       width="30%">
       <el-form v-loading="EditLoading" 
       ref="ruleFormRef"
+      label-width="150px"
       :model="EditData"
       :rules="rules">
         <el-form-item prop="repository_name">

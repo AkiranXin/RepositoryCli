@@ -1,6 +1,7 @@
 <template lang="">
     <div>
         <el-table :data="pageData.completeData[pageInfo.currentPage]" stripe>
+            <el-table-column type="selection" width="55" />
             <el-table-column prop="user_account" label="账号" width="180" />
             <el-table-column prop="user_pwd" label="密码" width="180" />
             <el-table-column prop="user_name" label="用户名" width="180" />
@@ -11,13 +12,16 @@
              </el-table-column >
             <el-table-column align="right">
               <template #header>
-  <el-input v-model="search" placeholder="Type to search account" clearable />
+                <el-input v-model="search" style="width: 400px" placeholder="Type to search account" clearable/>
+                <el-button type="primary" style="margin-left: 10px" @Click="searchFun">
+                <el-icon><Search/></el-icon>
+                搜 索</el-button>
 </template>
               <template #default="scope">
   <el-button
     size="large"
     round
-    type="primary"
+    type="warning"
     @click="handleEdit(scope.$index, scope.row)"
     >修改</el-button
   >
@@ -42,7 +46,7 @@
       title="信息修改"
       v-model="editView"
       width="30%">
-      <el-form v-loading="EditLoading">
+      <el-form v-loading="EditLoading" label-width="150px">
         <el-form-item>
           <el-input class="edit_input" v-model="EditData.user_account" :placeholder="currentData.user_account" maxlength="20" minlength="6" show-word-limit clearable></el-input>
         </el-form-item>
@@ -87,7 +91,7 @@
 import { User } from "@element-plus/icons-vue/dist/types";
 import { DOMNodeTransforms } from "@vue/compiler-dom";
 import axios from "axios";
-import { ElLoading, ElMessageBox } from "element-plus";
+import { ElLoading, ElMessageBox, ElTable } from "element-plus";
 import { fa, tr } from "element-plus/lib/locale";
 import { serve } from "esbuild";
 import {
@@ -306,6 +310,27 @@ const UpdateInfo = async (done: () => void) => {
     .catch(() => {
       console.log(Error);
     });
+};
+
+const searchFun = async () => {
+  const res = await axios({
+    url: "http://localhost:8080/user/searchByName",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    params:{
+      name: search.value,
+    }
+  });
+  data.tableData = res.data;
+  pageData.completeData = [];
+  //分割数组，通过PageInfo指定的行数来分割
+  for (let i = 0, len = data.tableData.length; i < len; i += pageInfo.row) {
+    pageData.completeData.push(data.tableData.slice(i, i + pageInfo.row));
+  }
+  //最后给pageInfo里面的总页数进行赋值
+  pageInfo.totalPage = pageData.completeData.length * 10;
 };
 
 onMounted(() => {
