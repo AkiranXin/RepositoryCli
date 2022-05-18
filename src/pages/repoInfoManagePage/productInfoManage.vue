@@ -11,12 +11,14 @@
             <el-table-column align="right">
               <template #header>
                 <el-input v-model="search" style="width: 400px" placeholder="Type to search account" clearable/>
-                <el-button type="primary" style="margin-left: 10px" @Click="searchFun">搜 索</el-button>
+                <el-button type="primary" style="margin-left: 10px" @Click="searchFun">
+                <el-icon><Search/></el-icon>
+                搜 索</el-button>
               </template>
               <template #default="scope">
   <el-button
     round
-    type="primary"
+    type="warning"
     @click="handleEdit(scope.$index, scope.row)"
     >修 改</el-button
   >

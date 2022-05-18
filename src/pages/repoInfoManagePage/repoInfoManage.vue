@@ -11,10 +11,12 @@
             <el-table-column align="right">
               <template #header>
                 <el-input v-model="search" style="width: 400px" placeholder="Type to search account" clearable/>
-                <el-button type="primary" style="margin-left: 10px" @Click="searchFun">搜 索</el-button>
+                <el-button type="primary"  style="margin-left: 10px" @Click="searchFun">
+                <el-icon><Search/></el-icon>
+                搜 索</el-button>
               </template>
               <template #default="scope">
-  <el-button round type="primary" @click="handleEdit(scope.$index, scope.row)"
+  <el-button round type="warning" @click="handleEdit(scope.$index, scope.row)"
     >修改</el-button
   >
   <el-button round type="danger" @click="handleDelete(scope.$index, scope.row)"
@@ -44,8 +46,15 @@
         <el-form-item prop="repository_address">
           <el-input class="edit_input" v-model="EditData.repository_address" placeholder="仓库地址：" maxlength="30" show-word-limit clearable></el-input>
         </el-form-item>
-        <el-form-item prop="repository_catgory">
-          <el-input class="edit_input" v-model="EditData.repository_catgory" placeholder="仓库类别：" maxlength="10"  show-word-limit  clearable></el-input>
+        <el-form-item>
+          <el-select
+            v-model="EditData.repository_catgory"
+            placeholder="请选择仓库类型"
+          >
+            <el-option label="私有" value="私有"></el-option>
+            <el-option label="公有" value="公有"></el-option>
+            <el-option label="国有" value="国有"></el-option>
+          </el-select>
         </el-form-item>      
         <el-form-item prop="description">
           <el-input class="edit_input" v-model="EditData.description" placeholder="仓库描述" maxlength="30"  show-word-limit clearable></el-input>
@@ -114,6 +123,12 @@ const EditData = reactive({
   description: "",
 });
 
+const cateFilter = [
+  { text: "私有", value: "私有" },
+  { text: "公有", value: "公有" },
+  { text: "国有", value: "国有" },
+  ];
+
 const search = ref("");
 
 const EditLoading = ref(false);
@@ -164,6 +179,11 @@ const rules = reactive<FormRules>({
 });
 
 const ruleFormRef = ref<FormInstance>();
+
+const filterHandler = (value, row, column) =>{
+  const property = column["property"];
+  return row[property] === value;
+}
 
 //页面数据，用于分页
 /**
@@ -419,5 +439,8 @@ onMounted(() => {
 <style>
 .edit_input {
   margin: 0 auto;
+}
+.el-select__popper{
+  z-index: 9999 !important;
 }
 </style>
