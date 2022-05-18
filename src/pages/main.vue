@@ -11,7 +11,7 @@
         <div :style="{ display: 'flex', alignItems: 'center' }">
           <el-dropdown trigger="hover" @command="handleCommand">
             <span class="el-dropdown-link">
-              欢迎回来,{{ store.state.name }}
+              欢迎回来,{{ Edata.user_name }}
               <el-icon class="el-icon--right"><arrow-down /></el-icon>
             </span>
             <template #dropdown>
@@ -108,7 +108,7 @@
 
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import {
   Document,
   Menu as IconMenu,
@@ -144,6 +144,10 @@ const auth = computed(() => {
   }
 });
 
+const Edata = reactive({
+  user_name: "",
+})
+
 //路由
 const router = useRouter();
 const isCollapse = ref(false);
@@ -164,6 +168,10 @@ const handleCommand = (command: string | number | object) => {
     router.go(0);
   }
 };
+
+onMounted(()=>{
+  Edata.user_name = sessionStorage.getItem("name");
+})
 </script>
 
 

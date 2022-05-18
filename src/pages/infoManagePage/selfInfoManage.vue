@@ -160,28 +160,10 @@ const showDialog = () =>{
 }
 
 const getSelfInfo = async () => {
-  const res = await axios
-    .get("http://localhost:8080/user/login", {
-      params: {
-        user_account: sessionStorage.getItem("account"),
-      },
-    })
-    .catch(function (error) {
-      if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.header);
-      } else if (error.request) {
-        console.log(error.request);
-      } else {
-        console.log("error", error.message);
-      }
-    });
-  //不用在意，因为项目的模板用的不是ts的，所以会爆红
-  data.user_account = res.data[0].user_account;
-  data.user_name = res.data[0].user_name;
-  data.user_email = res.data[0].user_email;
-  data.authority = res.data[0].authority;
+  data.user_account = sessionStorage.getItem("account");
+  data.user_name = sessionStorage.getItem("name");
+  data.user_email = sessionStorage.getItem("email");
+  data.authority = sessionStorage.getItem("hasPermission");
 };
 
 //页面装载时加载
